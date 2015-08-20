@@ -3,22 +3,23 @@
 
 
 ## makeCacheMatrix wrapper function exposes 4 worker functions which are as follows:
-## set() -> to store a matrix 
-## get() -> to return the stored matrix
-## setinverse() -> to store a matrix which is the inverse of the given matrix
-## getinverse() -> to return the previously stored inverse matrix
+## 1. set() -> to store a matrix 
+## 2. get() -> to return the stored matrix
+## 3. setinverse() -> to store a matrix which is the inverse of the given matrix
+## 4. getinverse() -> to return the previously stored inverse matrix
 ## Usage Hint 1 - To initialize a matrix: a <- makeCacheMatrix(rbind(c(1, 2), c(2, 1)))
 ## Usage Hint 2 - To print the matrix stored currently: a$get()
 
 
 makeCacheMatrix <- function(x = matrix()) {
-  ## initialise the 'inv' variable
+  ## initialise the 'inv' matrix as NULL
   inv <- NULL  
   
-  ## change the matrix assigned
+  ## assign a matrix
   set <- function(y) {  
     x <<- y
-    inv <<- NULL
+    inv <<- NULL ## When a new matrix is assigned, clear off the inverse of previous matrix
+    message("Matrix assigned successfully!")
   }
   
   ## return the internally stored matrix
@@ -37,23 +38,29 @@ makeCacheMatrix <- function(x = matrix()) {
 }
 
 
-## This function acts as an interface to the Matrix created using makeCacheMatrix function
-## Use this function to compute the inverse of a matrix.
-## The first time this function is called, it computes the inverse of the matrix, 
-## stores the inverse internally and then returns the inverse matrix.
-## During subsequent calls, the inverse is returned from the internal copy, thereby avoid recomputation.
+## This function acts as an interface to the Matrix created using makeCacheMatrix function.
+## Use this function to access the inverse of a matrix.
+## This function checks to see if the inverse is already calculated. 
+## If so, it returns the previously stored inverse matrix.
+## If inverse matrix is not available, the function computes the inverse, 
+##    stores it in the 'inv' variable and returns the computed inverse matrix.
 
-## Usage Hint: cacheSolve(a) where 'a' is a list output of makeCacheMatrix()
+
+## Usage Hint: cacheSolve(a) where 'a' is the list output of makeCacheMatrix()
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
-  inv <- x$getinverse()
+  
+  inv <- x$getinverse()  ## Find what is currently stored inside the 'inv' variable.
+  
+  ## If inverse matrix is available, return it
   if(!is.null(inv)) {
     message("Retrieving inverse matrix from cache")
     return(inv)
   }
+  
+  ## Else, compute the inverse, store it in local variable, and return the value.
   message("Computing inverse of matrix")
   data <- x$get()
-  inv <- solve(data) ## Cache is empty. Compute the inverse matrix.
-  x$setinverse(inv) ## Store the computed inverse matrix in the cache variable
-  inv ## Return the inverse matrix
+  inv <- solve(data) 
+  x$setinverse(inv) 
+  inv 
 }
